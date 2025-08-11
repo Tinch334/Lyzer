@@ -1,0 +1,18 @@
+{
+    "languages" : {
+        "C": {
+            "line_comment": ["//"],
+            "multi_line_comment": ["/*", "*/"],
+            "extensions": ["c"]
+        },
+        "Go": {
+            "line_comment": ["//"],
+            "multi_line_comment": ["/*", "*/"],
+            "extensions": ["go"]
+        },
+        "Python": {
+            "line_comment": ["#"],
+            "extensions": ["py", "ipynb", "pyi", "pyc", "pyw", "pxd", "pyx", "pyd", "pyo"]
+        }
+    }
+}
