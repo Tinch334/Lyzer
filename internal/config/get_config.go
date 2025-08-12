@@ -5,15 +5,18 @@ import (
 	"encoding/json"
 )
 
+type LanguageMap map[string]LanguageInfo
+
 //Stores the data extracted from the JSON file.
 type LanguageInfo struct {
+	LanguageName string `json:"name"`
 	LineComment []string `json:"line_comment"`
 	MultiLineComment []string `json:"multi_line_comment"`
 	Extensions []string `json:"extensions"`
 }
 
 type Root struct {
-	Languages map[string]LanguageInfo `json:"languages"`
+	Languages LanguageMap `json:"languages"`
 }
 
 /*
@@ -21,31 +24,19 @@ For more efficient access we create an auxiliary structure, where each file exte
 name. That way we can directly get the corresponding file info.
 */
 type Info struct {
-	extensionMap *map[string]string
-	languages *map[string]LanguageInfo
+	languages *LanguageMap
 }
 
-func makeInfo(extensionMap *map[string]string, languages *map[string]LanguageInfo) *Info {
-	i := Info{extensionMap: extensionMap, languages: languages}
+func makeInfo(languages *LanguageMap) *Info {
+	i := Info{languages: languages}
 
 	return &i
 }
 
 //The following two functions can be used to get the file info structure associated with a language. The second argument indicates whether the
 //key was found.
-func (i* Info) GetInfoFromExtension(extension string) (LanguageInfo, bool) {
-	value, prs := (*i.languages)[(*i.extensionMap)[extension]]
 
-	return value, prs
-}
-
-func (i* Info) GetInfoFromName(name string) (LanguageInfo, bool) {
-	value, prs := (*i.languages)[name]
-
-	return value, prs
-}
-
-func GetConfig() (*Info, error ){
+func GetConfig() (*LanguageMap, error ){
 	var err error
 	var data Root
 
@@ -59,14 +50,16 @@ func GetConfig() (*Info, error ){
 		return nil, err
 	}
 
-	extensionMap := make(map[string]string)
+	extensionMap := make(LanguageMap)
 
 	//Associate each file extension with it's corresponding language.
 	for k, d := range data.Languages {
-		for _, elem := range d.Extensions {
-			extensionMap[elem] = k
+		li := data.Languages[k]
+
+		for _, elem := range d.Extensions {	
+			extensionMap[elem] = li
 		}
 	}
 
-	return makeInfo(&extensionMap, &data.Languages), nil
+	return &extensionMap, nil
 }
